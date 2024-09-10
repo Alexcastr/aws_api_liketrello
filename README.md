@@ -75,3 +75,8 @@ Para deployar el stack command
 serverless deploy --verbose
 
 ```
+
+# Frontend
+El frontend de esta API está construido con Next.js. Puedes encontrar el repositorio y las instrucciones de instalación en el siguiente enlace:
+
+[Repositorio del front end ](https://github.com/Alexcastr/likeTrello)
