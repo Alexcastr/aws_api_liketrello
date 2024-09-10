@@ -1,0 +1,88 @@
+org: startupgris
+service: api-liketrello
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:us-east-1:507748656252:table/Entries
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - httpApi:
+          path: /
+          method: get
+
+  addEntry:
+    handler: handler.addEntry
+    events:
+      - httpApi:
+          path: /entry
+          method: post
+  getEntries:
+    handler: handler.getEntries
+    events:
+      - httpApi:
+          path: /entries
+          method: get
+   
+
+  getEntry:
+    handler: handler.getEntry
+    events:
+      - httpApi:
+          path: /entry/{id}
+          method: get
+         
+
+  updateEntry:
+    handler: handler.updateEntry
+    events:
+      - httpApi:
+          path: /entry/{id}
+          method: put
+          
+  deleteEntry:
+    handler: handler.deleteEntry
+    events:
+      - httpApi:
+          path: /entry/{id}
+          method: delete
+
+resources:
+  Resources:
+    EntriesTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: "Entries"
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: "_id"
+            AttributeType: "S"
+          - AttributeName: "status"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "_id"
+            KeyType: "HASH"
+        TimeToLiveSpecification:
+          AttributeName: "createdAt"
+          Enabled: true
+        GlobalSecondaryIndexes:
+          - IndexName: "statusIndex"
+            KeySchema:
+              - AttributeName: "status"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+        StreamSpecification:
+          StreamViewType: "NEW_AND_OLD_IMAGES"
+        Tags:
+          - Key: "Environment"
+            Value: "Dev"
